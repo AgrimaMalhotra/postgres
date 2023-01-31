@@ -19,12 +19,12 @@ const postTask = (taskData) => {
   return newTask;
 }
 
-const updateTask = (id, taskData) => {
+const updateTask = async (id, taskData) => {
   console.log("PUT /task/:id Service");
-  if (models.Tasks.findOne({
+  if (await models.Tasks.findOne({
     where: { id: id }
-  }) !== null) {
-    models.Tasks.update(taskData, {
+  })) {
+    await models.Tasks.update(taskData, {
       where: { id: id }
     })
     return models.Tasks.findOne({
@@ -40,14 +40,18 @@ const changeTask = async (id, taskData) => {
   if (await models.Tasks.findOne({
     where: { id: id }
   })) {
-    await models.Tasks.update({ isComplete: taskData.isComplete }, {
+    let modification = {};
+    const key = Object.keys(taskData);
+    key.forEach(element => {
+      modification[element] = taskData[element];
+    });
+    await models.Tasks.update(modification, {
       where: { id: id }
     });
     return models.Tasks.findOne({
       where: { id: id }
     });
   }
-  console.log("Entry with ${id} does not exist")
   return `Entry with ${id} does not exist`
 }
 
